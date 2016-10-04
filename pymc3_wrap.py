@@ -55,6 +55,13 @@ from pymc3_extra import *
 #            lines={k: v['mean'] for k, v in pm.df_summary(traces_signoise[-1000:]).iterrows()})
 # https://pymc-devs.github.io/pymc3/notebooks/posterior_predictive.html
 
+# Runtime debugging:
+# FIXME Draw 1 sample and 1 good sample
+# FIXME Set some inputs and draw 1 sample
+# FIXME Show all intermediate values
+# FIXME Treat the model as a function and show intermediate values
+# FIXME Call function interface
+
 # Other fun things
 # https://stackoverflow.com/questions/24242660/pymc3-multiple-observed-values
 # https://stackoverflow.com/questions/30798447/porting-pymc2-code-to-pymc3-hierarchical-model-for-sports-analytics
