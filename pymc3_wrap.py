@@ -736,3 +736,17 @@ def test_AB():
     m = ms_merge([A, B, delta])
     m_draw(m)
     m_pymc3(m)
+
+
+def test_draw():
+    a = uniform(1,2)
+    b = uniform(a,2,name='$a$')
+    c = uniform(b,2)
+    d = uniform(a,b,name='alongname')
+    e = uniform(d,c,name='$a$')
+    observe(e,np.array([3,3,4]))
+    observe(e,10)
+    fix(a,T.constant(0.9))
+    m_draw(e)
+    m_draw_info(e)
+    m_pymc3(e)
