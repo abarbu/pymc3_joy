@@ -67,6 +67,12 @@ from pymc3_extra import *
 # https://stackoverflow.com/questions/30798447/porting-pymc2-code-to-pymc3-hierarchical-model-for-sports-analytics
 # https://stackoverflow.com/questions/22708513/porting-pymc2-bayesian-a-b-testing-example-to-pymc3
 # https://stackoverflow.com/questions/27382474/pymc3-parallel-computing-with-njobs1-vs-gpu
+# https://github.com/junpenglao/Bayesian-Cognitive-Modeling-in-Pymc3
+# https://github.com/nwngeek212/ProbabilisticProgramming/blob/master/ProbabilisticProgramming.ipynb
+# https://github.com/aloctavodia/Statistical-Rethinking-with-Python-and-PyMC
+# https://github.com/dadaromeo/bayes-dap
+# http://pymc-devs.github.io/pymc3/notebooks/bayesian_neural_network_advi.html
+# https://blog.quantopian.com/bayesian-deep-learning2/
 
 # Error guide:
 #
@@ -279,7 +285,6 @@ def m_name_map(m):
     def fargs(v, name, args, kwargs):
         return ()
     l = m_walk(fone, fedge, fargs, m)
-    print l
     return dict(zip(map(lambda x: x[0], l.values()), l.keys()))
 
 
