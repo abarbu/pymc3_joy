@@ -32,10 +32,9 @@ def model_info(model):
             print 'potential',
         if v in model.deterministics:
             print 'deterministic',
-            print ''
-            print 'Model test point logp', model.logp(model.test_point)
-            # FIXME This is annoyingly slow.. maybe we could somehow stop bfgs earlier?
-            # print 'Model max bfgs logp', model.logp(pm.find_MAP(model=model))
+        print ''
+    print 'Model test point logp', model.logp(model.test_point)
+    # FIXME The default bfgs optimizer is annoyingly slow.
     print 'Model max powell logp', model.logp(pm.find_MAP(model=model, fmin=optimize.fmin_powell))
 
 
