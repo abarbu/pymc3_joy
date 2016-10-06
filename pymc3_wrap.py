@@ -151,17 +151,17 @@ class M():
 
 # NOTE No function should ever return a naked V(). They should always be wrapped in M().
 class V():
-    def __init__(self, pymc3fn, args, kwargs, shape, var_type, var_kind, output_type, maybe_name, observed, fixed, printing):
+    def __init__(self, pymc3fn, args, kwargs, shape, var_type, var_kind, node_type, maybe_name, observed, fixed, printing):
         # var_type is continuous, discrete, deterministic, potential, etc.
         # var_kind is unif, N, Dir, Beta, etc.
-        # output_type is either a theano TensorVariable, None, or 'unknown'
+        # node_type is either a theano TensorVariable, None, or 'unknown'
         self.pymc3fn = pymc3fn
         self.args = args
         self.kwargs = kwargs
         self.shape = shape
         self.var_type = var_type
         self.var_kind = var_kind
-        self.output_type = output_type
+        self.node_type = node_type
         self.maybe_name = maybe_name
         self.observed = observed
         self.fixed = fixed
@@ -382,7 +382,7 @@ def m_pymc3(m, verbose=False):
 
 # Distributions
 
-def m_wrap(f, var_type, var_kind, output_type, *args, **kwargs):
+def m_wrap(f, var_type, var_kind, node_type, *args, **kwargs):
     #    https://github.com/pymc-devs/pymc3/issues/829
     name = kwargs.pop('name', False)
     v = V(f,
@@ -391,7 +391,7 @@ def m_wrap(f, var_type, var_kind, output_type, *args, **kwargs):
           kwargs.get('shape', 1),
           var_type,
           var_kind,
-          output_type,
+          node_type,
           name,
           'observed' in kwargs,
           False,
