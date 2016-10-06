@@ -46,7 +46,7 @@ def burn_and_thin(trace, burn, thin):
     return trace[burn::thin]
 
 
-def model_sample(m, nr, burn=1, thin=1, **kwargs):
+def model_sample(m, nr, burn=0, thin=1, **kwargs):
     return burn_and_thin(pm.sample(nr, **kwargs), burn, thin)
 
 
@@ -71,7 +71,7 @@ def model_sample_advi_nuts(m, nr, sample_args={}, nuts_args={}, advi_args={}):
         if 'n' not in advi_args:
             advi_args['n'] = 10000
         mu, sds, elbo = pm.variational.advi(**advi_args)
-        return model_sample(m, nr, pm.NUTS(scaling=m.dict_to_array(sds),
+        return model_sample(m, nr, step=pm.NUTS(scaling=m.dict_to_array(sds),
                                            is_cov=True, **nuts_args),
                             start=mu, **sample_args)
 
@@ -81,6 +81,6 @@ def model_sample_advi(m, nr, sample_args={}, advi_args={}):
         if 'n' not in advi_args:
             advi_args['n'] = nr
         fit = pm.variational.advi(**advi_args)
-        burn = sample_args.pop('burn', 1)
+        burn = sample_args.pop('burn', 0)
         thin = sample_args.pop('thin', 1)
         return burn_and_thin(pm.variational.sample_vp(fit, nr, **sample_args), burn, thin)
