@@ -151,15 +151,17 @@ class M():
 
 # NOTE No function should ever return a naked V(). They should always be wrapped in M().
 class V():
-    def __init__(self, pymc3fn, args, kwargs, shape, var_type, var_kind, maybe_name, observed, fixed, printing):
+    def __init__(self, pymc3fn, args, kwargs, shape, var_type, var_kind, output_type, maybe_name, observed, fixed, printing):
         # var_type is continuous, discrete, deterministic, potential, etc.
         # var_kind is unif, N, Dir, Beta, etc.
+        # output_type is either a theano TensorVariable, None, or 'unknown'
         self.pymc3fn = pymc3fn
         self.args = args
         self.kwargs = kwargs
         self.shape = shape
         self.var_type = var_type
         self.var_kind = var_kind
+        self.output_type = output_type
         self.maybe_name = maybe_name
         self.observed = observed
         self.fixed = fixed
@@ -380,7 +382,7 @@ def m_pymc3(m, verbose=False):
 
 # Distributions
 
-def m_wrap(f, var_type, var_kind, *args, **kwargs):
+def m_wrap(f, var_type, var_kind, output_type, *args, **kwargs):
     #    https://github.com/pymc-devs/pymc3/issues/829
     name = kwargs.pop('name', False)
     v = V(f,
@@ -389,6 +391,7 @@ def m_wrap(f, var_type, var_kind, *args, **kwargs):
           kwargs.get('shape', 1),
           var_type,
           var_kind,
+          output_type,
           name,
           'observed' in kwargs,
           False,
@@ -399,139 +402,139 @@ def m_wrap(f, var_type, var_kind, *args, **kwargs):
 
 def uniform(*args, **kwargs):
     #([lower, upper, transform])	Continuous uniform log-likelihood.
-    return m_wrap(pm.Uniform, 'continuous', '$\mathcal{U}$', *args, **kwargs)
+    return m_wrap(pm.Uniform, 'continuous', '$\mathcal{U}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def flat(*args, **kwargs):
     #(*args, **kwargs)	Uninformative log-likelihood that returns 0 regardless of the passed value.
-    return m_wrap(pm.Flat, 'continuous', 'flat', *args, **kwargs)
+    return m_wrap(pm.Flat, 'continuous', 'flat', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def normal(*args, **kwargs):
     #(*args, **kwargs)	Univariate normal log-likelihood.
-    return m_wrap(pm.Normal, 'continuous', '$\mathcal{N}$', *args, **kwargs)
+    return m_wrap(pm.Normal, 'continuous', '$\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def beta(*args, **kwargs):
     #([alpha, beta, mu, sd])	Beta log-likelihood.
-    return m_wrap(pm.Beta, 'continuous', 'Beta', *args, **kwargs)
+    return m_wrap(pm.Beta, 'continuous', 'Beta', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def exponential(*args, **kwargs):
     #(lam, *args, **kwargs)	Exponential log-likelihood.
-    return m_wrap(pm.Exponential, 'continuous', 'Exp', *args, **kwargs)
+    return m_wrap(pm.Exponential, 'continuous', 'Exp', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def laplace(*args, **kwargs):
     #(mu, b, *args, **kwargs)	Laplace log-likelihood.
-    return m_wrap(pm.Laplace, 'continuous', 'Lap', *args, **kwargs)
+    return m_wrap(pm.Laplace, 'continuous', 'Lap', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def studentT(*args, **kwargs):
     #(nu[, mu, lam, sd])	Non-central Student’s T log-likelihood.
-    return m_wrap(pm.StudentT, 'continuous', 't-dist', *args, **kwargs)
+    return m_wrap(pm.StudentT, 'continuous', 't-dist', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def cauchy(*args, **kwargs):
     #(alpha, beta, *args, **kwargs)	Cauchy log-likelihood.
-    return m_wrap(pm.Cauchy, 'continuous', 'cauchy', *args, **kwargs)
+    return m_wrap(pm.Cauchy, 'continuous', 'cauchy', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def halfCauchy(*args, **kwargs):
     #(beta, *args, **kwargs)	Half-Cauchy log-likelihood.
-    return m_wrap(pm.HalfCauchy, 'continuous', '1/2-cauchy', *args, **kwargs)
+    return m_wrap(pm.HalfCauchy, 'continuous', '1/2-cauchy', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def gamma(*args, **kwargs):
     #([alpha, beta, mu, sd])	Gamma log-likelihood.
-    return m_wrap(pm.Gamma, 'continuous', 'Gamma', *args, **kwargs)
+    return m_wrap(pm.Gamma, 'continuous', 'Gamma', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def weibull(*args, **kwargs):
     #(alpha, beta, *args, **kwargs)	Weibull log-likelihood.
-    return m_wrap(pm.Weibull, 'continuous', 'Weibull', *args, **kwargs)
+    return m_wrap(pm.Weibull, 'continuous', 'Weibull', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def studentTpos(*args, **kwargs):
     #(*args, **kwargs)
-    return m_wrap(pm.StudentTpos, 'continuous', 't-dist+', *args, **kwargs)
+    return m_wrap(pm.StudentTpos, 'continuous', 't-dist+', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def logNormal(*args, **kwargs):
     #([mu, sd, tau])	Log-normal log-likelihood.
-    return m_wrap(pm.Lognormal, 'continuous', 'log$\mathcal{N}$', *args, **kwargs)
+    return m_wrap(pm.Lognormal, 'continuous', 'log$\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def chiSquared(*args, **kwargs):
     #(nu, *args, **kwargs)	χ2χ2 log-likelihood.
-    return m_wrap(pm.ChiSquared, 'continuous', '$\chi^{2}$', *args, **kwargs)
+    return m_wrap(pm.ChiSquared, 'continuous', '$\chi^{2}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def halfNormal(*args, **kwargs):
     #([sd, tau])	Half-normal log-likelihood.
-    return m_wrap(pm.HalfNormal, '$\mathcal{N}^{+}$', *args, **kwargs)
+    return m_wrap(pm.HalfNormal, '$\mathcal{N}^{+}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def wald(*args, **kwargs):
     #([mu, lam, phi, alpha])	Wald log-likelihood.
-    return m_wrap(pm.Wald, 'continuous', 'wald', *args, **kwargs)
+    return m_wrap(pm.Wald, 'continuous', 'wald', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def pareto(*args, **kwargs):
     #(alpha, m, *args, **kwargs)	Pareto log-likelihood.
-    return m_wrap(pm.Pareto, 'continuous', 'pareto', *args, **kwargs)
+    return m_wrap(pm.Pareto, 'continuous', 'pareto', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def inverseGamma(*args, **kwargs):
     #(alpha[, beta])	Inverse gamma log-likelihood, the reciprocal of the gamma distribution.
-    return m_wrap(pm.InverseGamma, 'continuous', '$\text{Gamma}^-1$', *args, **kwargs)
+    return m_wrap(pm.InverseGamma, 'continuous', '$\text{Gamma}^-1$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def exGaussian(*args, **kwargs):
     #(mu, sigma, nu, *args, **kwargs)	Exponentially modified Gaussian log-likelihood.
-    return m_wrap(pm.ExGaussian, 'continuous', 'Exp(Gamma)', *args, **kwargs)
+    return m_wrap(pm.ExGaussian, 'continuous', 'Exp(Gamma)', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def binomial(*args, **kwargs):
     #(n, p, *args, **kwargs)	Binomial log-likelihood.
-    return m_wrap(pm.Binomial, 'discrete', 'Binomial', *args, **kwargs)
+    return m_wrap(pm.Binomial, 'discrete', 'Binomial', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def betaBinomial(*args, **kwargs):
     #(alpha, beta, n, *args, **kwargs)	Beta-binomial log-likelihood.
-    return m_wrap(pm.BetaBinomial, 'discrete', 'BetaBin', *args, **kwargs)
+    return m_wrap(pm.BetaBinomial, 'discrete', 'BetaBin', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def bernoulli(*args, **kwargs):
     #(p, *args, **kwargs)	Bernoulli log-likelihood
-    return m_wrap(pm.Bernoulli, 'discrete', 'Bern', *args, **kwargs)
+    return m_wrap(pm.Bernoulli, 'discrete', 'Bern', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def poisson(*args, **kwargs):
     #(mu, *args, **kwargs)	Poisson log-likelihood.
-    return m_wrap(pm.Poisson, 'discrete', 'Poisson', *args, **kwargs)
+    return m_wrap(pm.Poisson, 'discrete', 'Poisson', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def negativeBinomial(*args, **kwargs):
     #(mu, alpha, *args, **kwargs)	Negative binomial log-likelihood.
-    return m_wrap(pm.NegativeBinomial, 'discrete', 'NegBin', *args, **kwargs)
+    return m_wrap(pm.NegativeBinomial, 'discrete', 'NegBin', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def constantDist(*args, **kwargs):
     #(c, *args, **kwargs)	Constant log-likelihood.
-    return m_wrap(pm.ConstantDist, 'discrete', 'Const', *args, **kwargs)
+    return m_wrap(pm.ConstantDist, 'discrete', 'Const', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def zeroInflatedPoisson(*args, **kwargs):
     #(theta, psi, *args, **kwargs)	Zero-inflated Poisson log-likelihood.
-    return m_wrap(pm.ZeroInflatedPoisson, 'discrete', 'ZIPos', *args, **kwargs)
+    return m_wrap(pm.ZeroInflatedPoisson, 'discrete', 'ZIPos', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def discreteUniform(*args, **kwargs):
     #(lower, upper, *args, **kwargs)	Discrete uniform distribution.
-    return m_wrap(pm.DiscreteUniform, 'discrete', 'disc', *args, **kwargs)
+    return m_wrap(pm.DiscreteUniform, 'discrete', 'disc', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def geometric(*args, **kwargs):
     #(p, *args, **kwargs)	Geometric log-likelihood.
-    return m_wrap(pm.Geometric, 'discrete', 'Geom', *args, **kwargs)
+    return m_wrap(pm.Geometric, 'discrete', 'Geom', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def categorical(*args, **kwargs):
     #(p, *args, **kwargs)	Categorical log-likelihood.
-    return m_wrap(pm.Categorical, 'discrete', 'cat', *args, **kwargs)
+    return m_wrap(pm.Categorical, 'discrete', 'cat', T.scalar('x', dtype='int32'), *args, **kwargs)
 
 def mvNormal(*args, **kwargs):
     #(mu[, cov, tau])	Multivariate normal log-likelihood.
-    return m_wrap(pm.MvNormal, 'continuous', 'mv$\mathcal{N}$', *args, **kwargs)
+    return m_wrap(pm.MvNormal, 'continuous', 'mv$\mathcal{N}$', T.vector('x', dtype='floatX'), *args, **kwargs)
 
 def wishart(*args, **kwargs):
     #(n, V, *args, **kwargs)	Wishart log-likelihood.
-    return m_wrap(pm.Wishart, 'continuous', 'Wishart', *args, **kwargs)
+    return m_wrap(pm.Wishart, 'continuous', 'Wishart', T.vector('x', dtype='floatX'), *args, **kwargs)
 
 def lkjCorr(*args, **kwargs):
     #(n, p, *args, **kwargs)	The LKJ (Lewandowski, Kurowicka and Joe) log-likelihood.
-    return m_wrap(pm.LKJCorr, 'continuous', 'LKJ', *args, **kwargs)
+    return m_wrap(pm.LKJCorr, 'continuous', 'LKJ', T.matrix('x', dtype='floatX'), *args, **kwargs)
 
 def multinomial(*args, **kwargs):
     #(n, p, *args, **kwargs)	Multinomial log-likelihood.
-    return m_wrap(pm.Multinomial, 'discrete', 'multi', *args, **kwargs)
+    return m_wrap(pm.Multinomial, 'discrete', 'multi', T.vector('x', dtype='int32'), *args, **kwargs)
 
 def dirichlet(*args, **kwargs):
     #(a[, transform])	Dirichlet log-likelihood.
-    return m_wrap(pm.Dirichlet, 'discrete', 'Dir', *args, **kwargs)
+    return m_wrap(pm.Dirichlet, 'discrete', 'Dir', T.vector('x', dtype='int32'), *args, **kwargs)
 
 def flip(*args, **kwargs):
     return bernoulli(*args, **kwargs)
@@ -545,17 +548,18 @@ def fn(fun, *args, **kwargs):
     def f(name, *args, **kwargs):
         return pm.Deterministic(name, fun(*args), **kwargs)
     f.__name__ = 'fn(' + fun.__name__ + ')'
-    return m_wrap(f, 'deterministic', 'fn', *args, **kwargs)
+    return m_wrap(f, 'deterministic', 'fn', 'unknown', *args, **kwargs)
 
 def const(val, **kwargs):
-    def f(name, *args, **kwargs):
-        return pm.Deterministic(name, val, **kwargs)
-    return m_wrap(f, 'deterministic', 'fn', (), **kwargs)
+    x = normal(1, 0.001)
+    fix(x, val)
+    return x
 
 def density(fun, *args, **kwargs):
     def f(name, *args, **kwargs):
         return pm.DensityDist(name, fun, *args, **kwargs)
-    return m_wrap(f, 'density', 'density', *args, **kwargs)
+    # TODO Is this output type always correct?
+    return m_wrap(f, 'density', 'density', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 # Unlike other functions this one injects a into a model rather than
 # compose with one.
@@ -571,6 +575,7 @@ def add_potential(m, fn, *args, **kwargs):
                   kwargs.get('shape', 1),
                   'potential',
                   '$psi$',
+                  None,
                   name,
                   'observed' in kwargs,
                   False,
@@ -684,7 +689,7 @@ def m_draw(m, flabel=None):
 
 def m_draw_info(m):
     return m_draw(m, flabel=lambda v, n: n + ' ~ ' + v.var_kind)
-
+ 
 # Visualization of results
 
 def m_graph_fn(fn, trace, overall_m, ms=None, **kwargs):
@@ -706,6 +711,9 @@ def m_plot_posterior(trace, overall_m, ms=None, **kwargs):
 
 def m_autocorrplot(trace, overall_m, ms=None, **kwargs):
     m_graph_fn(pm.autocorrplot, trace, overall_m, ms, **kwargs)
+
+def m_trace_variable(trace, overall_m, m):
+    return trace[m_name_map(overall_m)[m.output]]
 
 # Runtime debugging
 
@@ -858,14 +866,14 @@ def test_draw():
     m_pymc3(e)
 
 def test_logistic():
-    challenger_data = np.array([(66,0), (70,1), (69,0),
-                                (68,0), (67,0), (72,0),
-                                (73,0), (70,0), (57,1),
-                                (63,1), (70,1), (78,0),
-                                (67,0), (53,1), (67,0),
-                                (75,0), (70,0), (81,0),
-                                (76,0), (79,0), (75,1),
-                                (76,0), (58,1)])
+    challenger_data = np.array([(66, 0), (70, 1), (69, 0),
+                                (68, 0), (67, 0), (72, 0),
+                                (73, 0), (70, 0), (57, 1),
+                                (63, 1), (70, 1), (78, 0),
+                                (67, 0), (53, 1), (67, 0),
+                                (75, 0), (70, 0), (81, 0),
+                                (76, 0), (79, 0), (75, 1),
+                                (76, 0), (58, 1)])
     temps = challenger_data[:, 0]
     outcomes = challenger_data[:, 1]
     def logistic(x, beta, alpha):
@@ -886,3 +894,67 @@ def test_logistic():
     m_autocorrplot(trace, outcome, ms=[alpha, beta])
     # Evaluating the model at a point (you can specify a subset of the variables if you want)
     print '-17 and 0.26 likelihood:', m_eval(outcome, {alpha: -17, beta: 0.26})
+
+def test_dark_skies():
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Ellipse
+    import numpy as np
+    def draw_sky(galaxies):
+        """adapted from Vishal Goklani"""
+        size_multiplier = 45
+        fig = plt.figure(figsize=(10,10))
+        #fig.patch.set_facecolor("blue")
+        ax = fig.add_subplot(111, aspect='equal')
+        n = galaxies.shape[0]
+        for i in range(n):
+            _g = galaxies[i, :]
+            x,y = _g[0], _g[1]
+            d = np.sqrt(_g[2]**2 + _g[3]**2)
+            a = 1.0/ (1 - d)
+            b = 1.0/(1 + d)
+            theta = np.degrees(np.arctan2(_g[3], _g[2])*0.5)
+            ax.add_patch(Ellipse(xy=(x, y), width=size_multiplier*a, height=size_multiplier*b, angle=theta) )
+        ax.autoscale_view(tight=True)
+        return fig
+    def euclidean_distance(x, y):
+        return np.sqrt(((x - y)**2)).sum(axis=1)
+    def f_distance(gxy_pos, halo_pos, c):
+        # foo_position should be a 2-d numpy array
+        # T.maximum() provides our element-wise maximum as in NumPy, but instead for theano tensors
+        return T.maximum(euclidean_distance(gxy_pos, halo_pos), c)[:, None]
+    def tangential_distance(glxy_position, halo_position):
+        # foo_position should be a 2-d numpy array
+        delta = glxy_position - halo_position
+        t = (2*T.arctan(delta[:, 1]/delta[:, 0]))
+        return T.stack([-T.cos(t), -T.sin(t)], axis=1)
+    n_sky = 3  # choose a file/sky to examine.
+    data = np.genfromtxt("pymc3_joy/Training_Sky%d.csv" % (n_sky),
+                         dtype=None,
+                         skip_header=1,
+                         delimiter=",",
+                         usecols=[1, 2, 3, 4])
+    print("Data on galaxies in sky %d." % n_sky)
+    print("position_x, position_y, e_1, e_2 ")
+    print(data[:3])
+    plt.title("Galaxy positions and ellipcities of sky %d." % n_sky)
+    plt.xlabel("x-position")
+    plt.ylabel("y-position")
+    # The model:
+    mass_large = uniform(40, 180, name="mass_large")
+    halo_position = uniform(0, 4200, shape=(1,2), name="halo_position")
+    mean = fn(lambda m, p: m / f_distance(T.as_tensor(data[:, :2]), p, 240) * tangential_distance(T.as_tensor(data[:, :2]), p),
+              mass_large, halo_position,
+              name="mean_location")
+    ellpty = normal(mean, 1./0.05, name="ellipcity")
+    observe(ellpty, data[:, 2:])
+    m_draw(ellpty)
+    #
+    trace = model_sample_advi_nuts(m_pymc3(ellpty), 5000, advi_args={'n': 50000})
+    t = m_trace_variable(trace, ellpty, halo_position).reshape(5000, 2)
+    draw_sky(data)
+    plt.title("Galaxy positions and ellipcities of sky %d." % n_sky)
+    plt.xlabel("x-position")
+    plt.ylabel("y-position")
+    plt.scatter(t[:, 0], t[:, 1], alpha=0.015, c="r")
+    plt.xlim(0, 4200)
+    plt.ylim(0, 4200)
