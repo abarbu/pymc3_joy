@@ -402,7 +402,7 @@ def m_wrap(f, var_type, var_kind, node_type, *args, **kwargs):
 
 def uniform(*args, **kwargs):
     #([lower, upper, transform])	Continuous uniform log-likelihood.
-    return m_wrap(pm.Uniform, 'continuous', '$\mathcal{U}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.Uniform, 'continuous', '$\\mathcal{U}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def flat(*args, **kwargs):
     #(*args, **kwargs)	Uninformative log-likelihood that returns 0 regardless of the passed value.
@@ -410,7 +410,7 @@ def flat(*args, **kwargs):
 
 def normal(*args, **kwargs):
     #(*args, **kwargs)	Univariate normal log-likelihood.
-    return m_wrap(pm.Normal, 'continuous', '$\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.Normal, 'continuous', '$\\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def beta(*args, **kwargs):
     #([alpha, beta, mu, sd])	Beta log-likelihood.
@@ -450,15 +450,15 @@ def studentTpos(*args, **kwargs):
 
 def logNormal(*args, **kwargs):
     #([mu, sd, tau])	Log-normal log-likelihood.
-    return m_wrap(pm.Lognormal, 'continuous', 'log$\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.Lognormal, 'continuous', 'log$\\mathcal{N}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def chiSquared(*args, **kwargs):
     #(nu, *args, **kwargs)	χ2χ2 log-likelihood.
-    return m_wrap(pm.ChiSquared, 'continuous', '$\chi^{2}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.ChiSquared, 'continuous', '$\\chi^{2}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def halfNormal(*args, **kwargs):
     #([sd, tau])	Half-normal log-likelihood.
-    return m_wrap(pm.HalfNormal, '$\mathcal{N}^{+}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.HalfNormal, '$\\mathcal{N}^{+}$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def wald(*args, **kwargs):
     #([mu, lam, phi, alpha])	Wald log-likelihood.
@@ -470,7 +470,7 @@ def pareto(*args, **kwargs):
 
 def inverseGamma(*args, **kwargs):
     #(alpha[, beta])	Inverse gamma log-likelihood, the reciprocal of the gamma distribution.
-    return m_wrap(pm.InverseGamma, 'continuous', '$\text{Gamma}^-1$', T.scalar('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.InverseGamma, 'continuous', '$\\text{Gamma}^-1$', T.scalar('x', dtype='floatX'), *args, **kwargs)
 
 def exGaussian(*args, **kwargs):
     #(mu, sigma, nu, *args, **kwargs)	Exponentially modified Gaussian log-likelihood.
@@ -518,7 +518,7 @@ def categorical(*args, **kwargs):
 
 def mvNormal(*args, **kwargs):
     #(mu[, cov, tau])	Multivariate normal log-likelihood.
-    return m_wrap(pm.MvNormal, 'continuous', 'mv$\mathcal{N}$', T.vector('x', dtype='floatX'), *args, **kwargs)
+    return m_wrap(pm.MvNormal, 'continuous', 'mv$\\mathcal{N}$', T.vector('x', dtype='floatX'), *args, **kwargs)
 
 def wishart(*args, **kwargs):
     #(n, V, *args, **kwargs)	Wishart log-likelihood.
@@ -574,7 +574,7 @@ def add_potential(m, fn, *args, **kwargs):
                   kwargs,
                   kwargs.get('shape', 1),
                   'potential',
-                  '$psi$',
+                  '$\\psi$',
                   None,
                   name,
                   'observed' in kwargs,
@@ -810,7 +810,7 @@ def test_polynomial():
     # the 'correct' way to do this is to generate a normal noise and
     # add it to exact_ys but pymc won't let us observe a deterministic
     # variable for some reason. Our API allows this.
-    ys = normal(exact_ys, sd=0.1, name='$\epsilon$', testval=0.1)
+    ys = normal(exact_ys, sd=0.1, name='$\\epsilon$', testval=0.1)
     return ys
 
 def test_polynomial_right_way():
@@ -818,7 +818,7 @@ def test_polynomial_right_way():
     cs = normal(2, sd=10, shape=4, name='$c$')
     xs = normal(-2, sd=10, name='$x$', testval=0.1)
     exact_ys = fn(polynomial_fn, cs, xs, name='f(x)')
-    epsilon = normal(0, sd=0.1, name='$\epsilon$', testval=0.1)
+    epsilon = normal(0, sd=0.1, name='$\\epsilon$', testval=0.1)
     ys = fn(lambda x, y: x + y, exact_ys, epsilon)
     return ys
 
@@ -827,7 +827,7 @@ def test_polynomial_right_way_obs():
     cs = normal(2, sd=10, shape=4, name='$c$')
     xs = normal(-2, sd=10, name='$x$', testval=0.1)
     exact_ys = fn(polynomial_fn, cs, xs, name='f(x)')
-    epsilon = normal(0, sd=0.1, name='$\epsilon$', testval=0.1)
+    epsilon = normal(0, sd=0.1, name='$\\epsilon$', testval=0.1)
     ys_ = fn(lambda x, y: x + y, exact_ys, epsilon)
     ys_obs = normal(ys_, sd=0.01, name="obs_node")
     return ys_obs
@@ -879,8 +879,8 @@ def test_logistic():
     def logistic(x, beta, alpha):
         return 1.0 / (1.0 + np.exp(np.dot(beta, x) + alpha))
     # The model:
-    alpha = normal(0, 0.001, name='$alpha$')
-    beta = normal(0, 0.001, name='$beta$')
+    alpha = normal(0, 0.001, name='$\\alpha$')
+    beta = normal(0, 0.001, name='$\\beta$')
     t = normal(0, sd=100, name="T")
     p = fn(logistic, t, beta, alpha, name="p")
     outcome = flip(p, name="obs")
