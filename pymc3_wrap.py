@@ -663,7 +663,7 @@ def chiSquared(*args, **kwargs):
 
 def halfNormal(*args, **kwargs):
     #([sd, tau])	Half-normal log-likelihood.
-    return m_wrap(pm.HalfNormal, '$\\mathcal{N}^{+}$', var_type_pymc3(), *args, **kwargs)
+    return m_wrap(pm.HalfNormal, 'continuous', '$\\mathcal{N}^{+}$', var_type_pymc3(), *args, **kwargs)
 
 def wald(*args, **kwargs):
     #([mu, lam, phi, alpha])	Wald log-likelihood.
