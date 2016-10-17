@@ -20,7 +20,7 @@ import os
 
 # How to use me from a notebook util this becomes a real package.
 #
-# git checkout git@github.com:abarbu/pymc3_joy.git
+# git clone git@github.com:abarbu/pymc3_joy.git
 #
 # Add this to your file:
 #
@@ -78,7 +78,7 @@ import os
 # FIXME NN Interface for ADVI
 
 # FIXME ADVI has a bug with step sizes when computing the next
-# value. If the gradients are extremely (but not near underflowing) it
+# value. If the gradients are extremely (but not near) underflowing it
 # eventually attempts to set the next value to nan. This can be seen
 # easily with the logistic regression if it's not clipped.
 
@@ -90,6 +90,7 @@ import os
 # https://github.com/junpenglao/Bayesian-Cognitive-Modeling-in-Pymc3
 # https://github.com/nwngeek212/ProbabilisticProgramming/blob/master/ProbabilisticProgramming.ipynb
 # https://github.com/aloctavodia/Statistical-Rethinking-with-Python-and-PyMC
+# https://github.com/aloctavodia/Statistical-Rethinking-with-Python-and-PyMC3
 # https://github.com/dadaromeo/bayes-dap
 # http://pymc-devs.github.io/pymc3/notebooks/bayesian_neural_network_advi.html
 # https://blog.quantopian.com/bayesian-deep-learning2/
@@ -657,7 +658,7 @@ def logNormal(*args, **kwargs):
     return m_wrap(pm.Lognormal, 'continuous', 'log$\\mathcal{N}$', var_type_pymc3(), *args, **kwargs)
 
 def chiSquared(*args, **kwargs):
-    #(nu, *args, **kwargs)	χ2χ2 log-likelihood.
+    #(nu, *args, **kwargs)	χ2 log-likelihood.
     return m_wrap(pm.ChiSquared, 'continuous', '$\\chi^{2}$', var_type_pymc3(), *args, **kwargs)
 
 def halfNormal(*args, **kwargs):
