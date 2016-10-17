@@ -47,7 +47,8 @@ def burn_and_thin(trace, burn, thin):
 
 
 def model_sample(m, nr, burn=0, thin=1, **kwargs):
-    return burn_and_thin(pm.sample(nr, **kwargs), burn, thin)
+    with m:
+        return burn_and_thin(pm.sample(nr, **kwargs), burn, thin)
 
 
 def model_sample_nuts(m, nr, sample_args={}, nuts_args={}):
